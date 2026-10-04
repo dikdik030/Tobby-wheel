@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0A1F1A">
+<title>🌿 Tobby 嘅今日命運轉盤</title>
+<style>
+  :root {
+    --dark: #0A1F1A;
+    --forest: #1A3D32;
+    --emerald: #4A9B6F;
+    --emerald-dark: #3A7A57;
+    --gold: #D4AF37;
+    --mint: #8AB4A0;
+    --cream: #F0F5F0;
+    --card: rgba(26, 61, 50, 0.5);
+    --border: rgba(138, 180, 160, 0.2);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "PingFang HK", "Samsung One", sans-serif;
+    background: var(--dark);
+    color: var(--cream);
+    min-height: 100vh;
+    padding: 0 0 60px;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    position: relative;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    top: -30%; left: 50%;
+    transform: translateX(-50%);
+    width: 140%; height: 70%;
+    background: radial-gradient(ellipse at center, rgba(74,155,111,0.25) 0%, rgba(74,155,111,0.06) 40%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: -20%; left: -20%;
+    width: 80%; height: 60%;
+    background: radial-gradient(ellipse at center, rgba(212,175,55,0.08) 0%, transparent 65%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  main, .header, .tabs { position: relative; z-index: 1; }
+
+  .header { text-align: center; padding: 26px 16px 14px; }
+  .header h1 {
+    font-size: 23px; margin: 0 0 6px; color: #fff; letter-spacing: 1.5px;
+    text-shadow: 0 0 24px rgba(74,155,111,.6);
+  }
+  .header p { font-size: 12px; color: var(--mint); margin: 0; letter-spacing: .5px; }
+  .header .name-badge {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 5px 16px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(74,155,111,.35), rgba(212,175,55,.18));
+    border: 1px solid rgba(212,175,55,.5);
+    font-size: 11px;
+    color: var(--gold);
+    font-weight: 700;
+    letter-spacing: 2px;
+    box-shadow: 0 0 18px rgba(212,175,55,.3);
+  }
+
+  .tabs {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; gap: 6px; overflow-x: auto;
+    padding: 12px 14px; margin-bottom: 18px;
+    background: rgba(10,31,26,0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex-shrink: 0;
+    padding: 9px 16px; border-radius: 999px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.03);
+    color: var(--mint);
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: all .25s cubic-bezier(.4,0,.2,1);
+    white-space: nowrap;
+  }
+  .tab:active { transform: scale(.95); }
+  .tab.active {
+    background: linear-gradient(135deg, var(--emerald), var(--emerald-dark));
+    color: #fff; border-color: transparent;
+    box-shadow: 0 4px 16px rgba(74,155,111,.5);
+    transform: translateY(-1px);
+  }
+  .tab.summary-tab.active {
+    background: linear-gradient(135deg, var(--gold), #B8941F);
+    color: #0A1F1A;
+    box-shadow: 0 4px 16px rgba(212,175,55,.5);
+  }
+
+  .section { display: none; padding: 0 16px; max-width: 480px; margin: 0 auto; }
+  .section.active { display: block; animation: fadeIn .35s cubic-bezier(.4,0,.2,1); }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .spin-all-bar {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 18px;
+    padding: 14px 16px;
+    background: linear-gradient(135deg, rgba(74,155,111,.12), rgba(212,175,55,.06));
+    border: 1px solid rgba(212,175,55,.3);
+    border-radius: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .spin-all-bar::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 20%; right: 20%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(212,175,55,.6), transparent);
+  }
+  button.spin-all-btn {
+    padding: 13px 36px; border: none; border-radius: 999px;
+    background: linear-gradient(135deg, var(--gold), #B8941F);
+    color: #0A1F1A; font-size: 15px; font-weight: 800;
+    cursor: pointer; transition: all .18s cubic-bezier(.4,0,.2,1);
+    box-shadow: 0 4px 18px rgba(212,175,55,.5), inset 0 1px 0 rgba(255,255,255,.3);
+    min-height: 46px;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+  button.spin-all-btn:active {
+    transform: scale(.95);
+    box-shadow: 0 2px 10px rgba(212,175,55,.35);
+  }
+  button.spin-all-btn:disabled { opacity: .4; }
+
+  .grid { display: flex; flex-direction: column; gap: 16px; }
+  .card {
+    background: linear-gradient(160deg, rgba(26,61,50,0.7) 0%, rgba(26,61,50,0.35) 100%);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 18px 16px 20px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 6px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.05);
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 10%; right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(212,175,55,.4), transparent);
+  }
+  .card h2 {
+    font-size: 15px; margin: 0 0 14px; font-weight: 600;
+    color: var(--mint); letter-spacing: .8px;
+  }
+  .wheel-box { position: relative; width: 184px; height: 184px; margin: 0 auto; }
+  .wheel-box canvas {
+    width: 100%; height: 100%; border-radius: 50%;
+    transition: transform 4.2s cubic-bezier(.15,.8,.2,1);
+    box-shadow:
+      0 0 0 5px rgba(74,155,111,.22),
+      0 0 30px rgba(74,155,111,.18),
+      0 12px 28px rgba(0,0,0,.55);
+  }
+  .pointer {
+    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 11px solid transparent;
+    border-right: 11px solid transparent;
+    border-top: 22px solid var(--gold);
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,.7)) drop-shadow(0 0 8px rgba(212,175,55,.7));
+    z-index: 5;
+  }
+  .hub {
+    position: absolute; top: 50%; left: 50%;
+    width: 36px; height: 36px; margin: -18px 0 0 -18px;
+    background: radial-gradient(circle at 30% 30%, #1A3D32, var(--dark));
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 800; color: var(--gold); z-index: 4;
+    box-shadow: 0 0 12px rgba(212,175,55,.5), inset 0 0 8px rgba(212,175,55,.2);
+  }
+  .result {
+    margin-top: 14px; font-size: 16px; font-weight: 700;
+    min-height: 24px; color: var(--gold);
+    letter-spacing: .3px;
+    transition: all .3s;
+  }
+  .result.pop { animation: pop .4s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes pop {
+    0% { transform: scale(.7); opacity: .3; }
+    60% { transform: scale(1.08); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  button.spin-btn {
+    margin-top: 12px; padding: 12px 30px; border: none; border-radius: 999px;
+    background: linear-gradient(135deg, var(--emerald), var(--emerald-dark));
+    color: #fff; font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: all .18s cubic-bezier(.4,0,.2,1);
+    box-shadow: 0 4px 16px rgba(74,155,111,.4);
+    min-height: 46px;
+    letter-spacing: .5px;
+  }
+  button.spin-btn:active {
+    transform: scale(.95);
+    box-shadow: 0 2px 8px rgba(74,155,111,.3);
+  }
+  button.spin-btn:disabled { opacity: .35; }
+
+  .balls { display: flex; flex-wrap: wrap; gap: 9px; justify-content: center; margin: 16px 0 6px; }
+  .ball {
+    width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; font-weight: 800;
+    background: linear-gradient(135deg, var(--emerald), var(--emerald-dark));
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(74,155,111,.4), inset 0 1px 0 rgba(255,255,255,.25);
+    opacity: 0; transform: scale(.3);
+    transition: all .45s cubic-bezier(.34,1.56,.64,1);
+  }
+  .ball.show { opacity: 1; transform: scale(1); }
+  .ball.special {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    box-shadow: 0 4px 14px rgba(255,215,0,.5), inset 0 1px 0 rgba(255,255,255,.3);
+  }
+  .ball-label { font-size: 11px; color: var(--mint); margin-top: 10px; min-height: 16px; letter-spacing: .5px; }
+
+  .lottery-section { margin-bottom: 20px; }
+  .lottery-section h3 {
+    font-size: 14px; color: var(--mint); margin: 0 0 6px; font-weight: 600;
+    letter-spacing: .8px;
+  }
+
+  /* ===== 總結頁 ===== */
+  .summary-wrap {
+    background: linear-gradient(160deg, rgba(26,61,50,0.75) 0%, rgba(26,61,50,0.4) 100%);
+    border: 1px solid rgba(212,175,55,.35);
+    border-radius: 22px;
+    padding: 22px 18px 24px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.05);
+  }
+  .summary-wrap::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 15%; right: 15%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(212,175,55,.7), transparent);
+  }
+  .summary-header {
+    text-align: center;
+    padding-bottom: 16px;
+    border-bottom: 1px dashed rgba(212,175,55,.3);
+    margin-bottom: 18px;
+  }
+  .summary-header .title {
+    font-size: 18px; font-weight: 800; color: var(--gold);
+    letter-spacing: 2px;
+    text-shadow: 0 0 16px rgba(212,175,55,.4);
+  }
+  .summary-header .date {
+    font-size: 11px; color: var(--mint); margin-top: 6px;
+    letter-spacing: 1px;
+  }
+  .summary-section-title {
+    font-size: 12px; font-weight: 700; color: var(--gold);
+    letter-spacing: 1.5px;
+    margin: 18px 0 10px;
+    padding-left: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .summary-section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(212,175,55,.4), transparent);
+  }
+  .summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 4px;
+    border-bottom: 1px solid rgba(138,180,160,.1);
+    font-size: 13px;
+    gap: 12px;
+  }
+  .summary-item:last-child { border-bottom: none; }
+  .summary-item .k {
+    color: var(--mint);
+    flex-shrink: 0;
+    font-size: 12.5px;
+  }
+  .summary-item .v {
+    color: var(--gold);
+    font-weight: 700;
+    text-align: right;
+    font-size: 13.5px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+  }
+  .summary-item .v .time {
+    font-size: 9.5px;
+    color: var(--mint);
+    font-weight: 400;
+    letter-spacing: .5px;
+    opacity: .7;
+  }
+  .summary-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--mint);
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .summary-empty .big {
+    font-size: 36px;
+    display: block;
+    margin-bottom: 12px;
+    opacity: .5;
+  }
+  .summary-footer {
+    text-align: center;
+    padding-top: 16px;
+    margin-top: 18px;
+    border-top: 1px dashed rgba(212,175,55,.3);
+    font-size: 11px;
+    color: var(--mint);
+    letter-spacing: 1px;
+    line-height: 1.7;
+  }
+  .summary-footer .update-time {
+    font-size: 10px;
+    opacity: .7;
+    margin-top: 4px;
+  }
+  .summary-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 18px;
+  }
+  button.share-btn {
+    padding: 13px 24px; border: none; border-radius: 999px;
+    background: linear-gradient(135deg, #25D366, #128C7E);
+    color: #fff; font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: all .18s;
+    box-shadow: 0 4px 16px rgba(37,211,102,.4);
+    min-height: 46px;
+    letter-spacing: .5px;
+  }
+  button.share-btn:active { transform: scale(.95); }
+  button.clear-btn {
+    padding: 11px 24px; border: 1px solid rgba(255,100,100,.4); border-radius: 999px;
+    background: rgba(255,100,100,.08);
+    color: #ff8888; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all .18s;
+    min-height: 42px;
+    letter-spacing: .5px;
+  }
+  button.clear-btn:active { transform: scale(.95); background: rgba(255,100,100,.15); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🌿 Tobby 嘅今日命運轉盤</h1>
+  <p>Tobby，唔知做咩好？等個天話你知。</p>
+  <div class="name-badge">✨ TOBBY 專屬 ✨</div>
+</div>
+
+<nav class="tabs">
+  <button class="tab active" data-tab="daily">🌅 今日日程</button>
+  <button class="tab" data-tab="reward">🎁 獎勵運氣</button>
+  <button class="tab" data-tab="punish">😈 懲罰</button>
+  <button class="tab" data-tab="lottery">🎰 六合彩</button>
+  <button class="tab summary-tab" data-tab="summary">📸 總結</button>
+</nav>
+
+<main>
+  <section id="daily" class="section active">
+    <div class="spin-all-bar"><button class="spin-all-btn" data-section="daily">🎡 全部轉！</button></div>
+    <div class="grid"></div>
+  </section>
+  <section id="reward" class="section">
+    <div class="spin-all-bar"><button class="spin-all-btn" data-section="reward">🎡 全部轉！</button></div>
+    <div class="grid"></div>
+  </section>
+  <section id="punish" class="section">
+    <div class="spin-all-bar"><button class="spin-all-btn" data-section="punish">🎡 全部轉！</button></div>
+    <div class="grid"></div>
+  </section>
+  <section id="lottery" class="section">
+    <div class="spin-all-bar"><button class="spin-all-btn" id="lotteryBtn">🎰 一次過抽晒</button></div>
+    <div class="card lottery-section">
+      <h3>🎰 Tobby 嘅六合彩號碼</h3>
+      <div class="balls" id="ballsTobby"></div>
+      <div class="ball-label" id="labelTobby">撳上面開始攪珠</div>
+    </div>
+    <div class="card lottery-section">
+      <h3>💚 Mandy 嘅六合彩號碼</h3>
+      <div class="balls" id="ballsMandy"></div>
+      <div class="ball-label" id="labelMandy">撳上面開始攪珠</div>
+    </div>
+  </section>
+  <section id="summary" class="section">
+    <div class="summary-wrap" id="summaryWrap"></div>
+  </section>
+</main>
+
+<script>
+// ===== 多倫多時區 =====
+const TIMEZONE = 'America/Toronto';
+
+function getCanadaDateStr() {
+  const now = new Date();
+  const fmt = new Intl.DateTimeFormat('en-CA', {
+    timeZone: TIMEZONE,
+    year: 'numeric', month: '2-digit', day: '2-digit'
+  });
+  return fmt.format(now);
+}
+
+function getCanadaDateDisplay() {
+  const now = new Date();
+  const fmt = new Intl.DateTimeFormat('zh-HK', {
+    timeZone: TIMEZONE,
+    year: 'numeric', month: 'long', day: 'numeric', weekday: 'short',
+    hour: '2-digit', minute: '2-digit', hour12: false
+  });
+  return fmt.format(now) + ' · 多倫多時間';
+}
+
+function formatTime(ts) {
+  const d = new Date(ts);
+  const fmt = new Intl.DateTimeFormat('zh-HK', {
+    timeZone: TIMEZONE,
+    hour: '2-digit', minute: '2-digit', hour12: false
+  });
+  return fmt.format(d);
+}
+
+// ===== 轉盤設定 =====
+const sections = {
+  daily: [
+    { label: '🌅 早餐食咩', options: ['港式茶餐廳','粥粉麵','西式早餐','Bagel','中式點心','日式飯糰','自己煮燕麥','Tim Hortons','麥當勞'] },
+    { label: '☀️ 朝早做咩', options: ['做運動','睇書','散步','聽 Podcast','執屋','飲杯咖啡'] },
+    { label: '🏃 今日要唔要做運動', options: ['要','唔要'] },
+    { label: '💪 今日做咩運動', options: ['散步','打羽毛球','跑步','拉筋'] },
+    { label: '🍜 午餐食咩', options: ['米線','燒味飯','拉麵','越南粉','壽司','漢堡','兩餸飯','炒飯炒麵','沙律','三文治'] },
+    { label: '🌤️ 晏晝做咩', options: ['睇戲','行 Sephora','去 Crumble Cookie','食乳酪雪糕','咖啡店','打機','瞓晏覺','做嘢','睇書','行公園'] },
+    { label: '💤 今日午睡幾耐', options: ['10分鐘','15分鐘','20分鐘','30分鐘','45分鐘','1小時','1.5小時','2小時','唔瞓','自然醒'] },
+    { label: '🌙 晚餐食咩', options: ['火鍋','韓燒','壽司','意粉','咖喱','外賣','自己煮','燒烤','中式小炒'] },
+    { label: '🌙 今晚幾點瞓', options: ['22:00','22:30','23:00','23:30','00:00','00:30','01:00','02:00','自然瞓'] },
+    { label: '⏰ 聽日幾點起身', options: ['7:00','7:30','8:00','8:30','9:00','9:30','10:00','10:30','11:00','自然醒'] },
+  ],
+  reward: [
+    { label: '🍀 Tobby 今日運氣', options: [
+      '爆棚 🔥','無敵 ⭐','全宇宙最強 💪','心想事成 ✨','好事連連 🎉','貴人相助 🙌','財運亨通 💰','桃花旺盛 🌸','事業起飛 🚀','天選之人 👑','光芒萬丈 ☀️','無人能敵 🏆'
+    ]},
+    { label: '👕 Tobby 今日著咩色衫', options: ['黑','白','灰','藍','綠','紅','黃','粉紅','米色','紫色'] },
+    { label: '🍦 Tobby 今日甜品', options: ['雪糕','蛋糕','朱古力','生果','曲奇餅','乳酪雪糕','唔食'] },
+    { label: '🛒 Tobby 今日買咩', options: ['買','只買必需品','買化妝品','買零食','買雪糕'] },
+    { label: '🎁 Tobby 今日獎勵自己', options: ['睇劇','買嘢','食甜品','瞓晏覺','打機','乜都唔做','行 Sephora','食乳酪雪糕'] },
+  ],
+  punish: [
+    { label: '😈 Tobby 唔準時起身懲罰', options: [
+      '做20下深蹲','做30下掌上壓','做50下跳躍','飲一大杯可樂加冰','買曲奇餅食','唱一首歌俾自己聽','對鏡講「我好靚仔」','跳一段舞',
+      'send CODE 俾 Mandy','視訊通話唱一首歌俾 Mandy 聽','傳訊息俾 Mandy 講我愛你','傳搞笑 meme 俾 Mandy','錄 30 秒語音讚 Mandy','寫 100 字讚 Mandy 再發過去','Mandy 指定你錄一段片','Mandy 消失一個鐘'
+    ]},
+  ],
+};
+
+const SECTION_TITLES = {
+  daily: '🌅 今日日程',
+  reward: '🎁 獎勵運氣',
+  punish: '😈 懲罰',
+};
+
+const GREEN_PALETTE = ['#1B4D3E','#2E6B52','#4A9B6F','#6BBF8A','#8AB4A0','#A8D5BA','#C8E6D0','#3A7A57'];
+
+// ===== localStorage =====
+const LS_KEYS = {
+  results: 'tobby_results',
+  lottery: 'tobby_lottery',
+  lastDate: 'tobby_last_date',
+  lastUpdate: 'tobby_last_update',
+};
+
+const results = {};
+const lotteryResults = { tobby: [], mandy: [] };
+Object.keys(sections).forEach(k => results[k] = {});
+
+function checkDailyReset() {
+  const today = getCanadaDateStr();
+  const storedDate = localStorage.getItem(LS_KEYS.lastDate);
+  if (storedDate !== today) {
+    localStorage.removeItem(LS_KEYS.results);
+    localStorage.removeItem(LS_KEYS.lottery);
+    localStorage.removeItem(LS_KEYS.lastUpdate);
+    localStorage.setItem(LS_KEYS.lastDate, today);
+    return true;
+  }
+  return false;
+}
+
+function saveResults() {
+  try {
+    localStorage.setItem(LS_KEYS.results, JSON.stringify(results));
+    localStorage.setItem(LS_KEYS.lottery, JSON.stringify(lotteryResults));
+    localStorage.setItem(LS_KEYS.lastUpdate, Date.now().toString());
+    localStorage.setItem(LS_KEYS.lastDate, getCanadaDateStr());
+  } catch(e) {}
+}
+
+function loadResults() {
+  try {
+    const r = localStorage.getItem(LS_KEYS.results);
+    if (r) {
+      const parsed = JSON.parse(r);
+      Object.keys(parsed).forEach(key => {
+        if (results[key]) Object.assign(results[key], parsed[key]);
+      });
+    }
+    const l = localStorage.getItem(LS_KEYS.lottery);
+    if (l) {
+      const parsed = JSON.parse(l);
+      if (parsed.tobby) lotteryResults.tobby = parsed.tobby;
+      if (parsed.mandy) lotteryResults.mandy = parsed.mandy;
+    }
+  } catch(e) {}
+}
+
+function clearAll() {
+  Object.keys(results).forEach(key => { results[key] = {}; });
+  lotteryResults.tobby = [];
+  lotteryResults.mandy = [];
+  localStorage.removeItem(LS_KEYS.results);
+  localStorage.removeItem(LS_KEYS.lottery);
+  localStorage.removeItem(LS_KEYS.lastUpdate);
+}
+
+checkDailyReset();
+loadResults();
+
+// ===== 畫轉盤 =====
+function drawWheel(canvas, options) {
+  const dpr = window.devicePixelRatio || 1;
+  const size = 184;
+  canvas.width = size * dpr;
+  canvas.height = size * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const cx = size/2, cy = size/2, r = size/2 - 2;
+  const n = options.length;
+  const seg = (Math.PI * 2) / n;
+  for (let i = 0; i < n; i++) {
+    const start = i * seg, end = start + seg;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, start, end);
+    ctx.closePath();
+    ctx.fillStyle = GREEN_PALETTE[i % GREEN_PALETTE.length];
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(10,31,26,.5)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.save();
+    ctx.translate(cx, cy);
+    const mid = start + seg/2;
+    ctx.rotate(mid);
+    ctx.fillStyle = '#fff';
+    ctx.font = `bold ${n > 15 ? 7 : n > 10 ? 8 : n > 7 ? 10 : n > 5 ? 12 : 14}px sans-serif`;
+    ctx.textBaseline = 'middle';
+    if (mid > Math.PI/2 && mid < Math.PI*1.5) {
+      ctx.rotate(Math.PI);
+      ctx.textAlign = 'left';
+      ctx.fillText(options[i], -r + 8, 0);
+    } else {
+      ctx.textAlign = 'right';
+      ctx.fillText(options[i], r - 8, 0);
+    }
+    ctx.restore();
+  }
+}
+
+// ===== 建立轉盤 =====
+const sectionWheels = {};
+const allWheels = [];
+
+Object.keys(sections).forEach(key => {
+  sectionWheels[key] = [];
+  const container = document.querySelector(`#${key} .grid`);
+  sections[key].forEach(cat => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <h2>${cat.label}</h2>
+      <div class="wheel-box">
+        <div class="pointer"></div>
+        <canvas></canvas>
+        <div class="hub">T</div>
+      </div>
+      <div class="result">—</div>
+      <button class="spin-btn">轉！</button>
+    `;
+    container.appendChild(card);
+    const canvas = card.querySelector('canvas');
+    const resultEl = card.querySelector('.result');
+    const btn = card.querySelector('button');
+    drawWheel(canvas, cat.options);
+    const state = {
+      rotation: 0,
+      spinning: false,
+      options: cat.options,
+      canvas,
+      resultEl,
+      btn,
+      label: cat.label,
+      sectionKey: key,
+    };
+    btn.addEventListener('click', () => spin(state));
+    allWheels.push(state);
+    sectionWheels[key].push(state);
+
+    const saved = results[key] && results[key][cat.label];
+    if (saved) {
+      resultEl.textContent = saved.value || saved;
+    }
+  });
+});
+
+// ===== 震動 =====
+function vibrate(pattern) {
+  if (navigator.vibrate) {
+    try { navigator.vibrate(pattern); } catch(e) {}
+  }
+}
+
+// ===== 轉！ =====
+function spin(state) {
+  if (state.spinning) return;
+  state.spinning = true;
+  state.btn.disabled = true;
+  state.resultEl.classList.remove('pop');
+  state.resultEl.textContent = '...';
+  const n = state.options.length;
+  const seg = (Math.PI * 2) / n;
+
+  let idx;
+  if (window.crypto && window.crypto.getRandomValues) {
+    const rand = new Uint32Array(1);
+    window.crypto.getRandomValues(rand);
+    idx = rand[0] % n;
+  } else {
+    idx = Math.floor(Math.random() * n);
+  }
+
+  const targetAngle = -Math.PI/2 - (idx + 0.5) * seg;
+  const currentMod = ((state.rotation % (Math.PI*2)) + Math.PI*2) % (Math.PI*2);
+  let delta = targetAngle - currentMod;
+  delta = ((delta % (Math.PI*2)) + Math.PI*2) % (Math.PI*2);
+  const turns = 5 + Math.floor(Math.random() * 3);
+  state.rotation += turns * Math.PI * 2 + delta;
+  state.canvas.style.transform = `rotate(${state.rotation}rad)`;
+
+  setTimeout(() => {
+    const value = state.options[idx];
+    state.resultEl.textContent = value;
+    state.resultEl.classList.add('pop');
+    state.spinning = false;
+    state.btn.disabled = false;
+
+    vibrate(30);
+
+    results[state.sectionKey][state.label] = {
+      value: value,
+      time: Date.now(),
+    };
+    saveResults();
+
+    if (document.getElementById('summary').classList.contains('active')) {
+      renderSummary();
+    }
+  }, 4300);
+}
+
+// ===== 每頁「全部轉！」 =====
+document.querySelectorAll('.spin-all-btn[data-section]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const sectionId = btn.dataset.section;
+    const wheels = sectionWheels[sectionId];
+    if (!wheels || wheels.length === 0) return;
+
+    btn.disabled = true;
+    const originalText = btn.textContent;
+    btn.textContent = '⏳ 轉緊...';
+
+    wheels.forEach((w, i) => {
+      setTimeout(() => spin(w), i * 250);
+    });
+
+    const totalTime = 4300 + (wheels.length - 1) * 250 + 300;
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }, totalTime);
+  });
+});
+
+// ===== Tab 切換 =====
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.tab).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    if (tab.dataset.tab === 'summary') {
+      renderSummary();
+    }
+  });
+});
+
+// ===== 總結渲染 =====
+function renderSummary() {
+  const wrap = document.getElementById('summaryWrap');
+  const dateDisplay = getCanadaDateDisplay();
+
+  let html = `
+    <div class="summary-header">
+      <div class="title">📸 今日總結</div>
+      <div class="date">${dateDisplay}</div>
+    </div>
+  `;
+
+  let hasAny = false;
+  let plainText = `📸 Tobby 今日總結\n${dateDisplay}\n\n`;
+
+  Object.keys(sections).forEach(key => {
+    const sectionResults = results[key];
+    const entries = Object.entries(sectionResults);
+    if (entries.length === 0) return;
+    hasAny = true;
+    html += `<div class="summary-section-title">${SECTION_TITLES[key] || key}</div>`;
+    plainText += `${SECTION_TITLES[key]}\n`;
+    entries.forEach(([label, obj]) => {
+      const value = obj.value || obj;
+      const time = obj.time ? formatTime(obj.time) : '';
+      html += `
+        <div class="summary-item">
+          <span class="k">${label}</span>
+          <span class="v">
+            ${value}
+            ${time ? `<span class="time">${time}</span>` : ''}
+          </span>
+        </div>
+      `;
+      plainText += `  ${label}：${value}\n`;
+    });
+    plainText += '\n';
+  });
+
+  if (lotteryResults.tobby.length > 0 || lotteryResults.mandy.length > 0) {
+    hasAny = true;
+    html += `<div class="summary-section-title">🎰 六合彩</div>`;
+    plainText += `🎰 六合彩\n`;
+    if (lotteryResults.tobby.length > 0) {
+      const normal = lotteryResults.tobby.slice(0, 6).join(' · ');
+      const special = lotteryResults.tobby[6];
+      html += `
+        <div class="summary-item">
+          <span class="k">🎰 Tobby</span>
+          <span class="v">${normal} ＋ <span style="color:#FFD700;">${special}</span></span>
+        </div>
+      `;
+      plainText += `  Tobby：${normal} ＋ ${special}\n`;
+    }
+    if (lotteryResults.mandy.length > 0) {
+      const normal = lotteryResults.mandy.slice(0, 6).join(' · ');
+      const special = lotteryResults.mandy[6];
+      html += `
+        <div class="summary-item">
+          <span class="k">💚 Mandy</span>
+          <span class="v">${normal} ＋ <span style="color:#FFD700;">${special}</span></span>
+        </div>
+      `;
+      plainText += `  Mandy：${normal} ＋ ${special}\n`;
+    }
+    plainText += '\n';
+  }
+
+  if (!hasAny) {
+    html += `
+      <div class="summary-empty">
+        <span class="big">🎡</span>
+        仲未轉過任何嘢喎！<br>
+        去轉下轉盤，再返嚟睇總結啦～
+      </div>
+    `;
+  } else {
+    const lastUpdate = localStorage.getItem(LS_KEYS.lastUpdate);
+    const updateStr = lastUpdate ? `最後更新：${formatTime(parseInt(lastUpdate))}` : '';
+    html += `
+      <div class="summary-footer">
+        🌿 截圖或分享俾 Mandy 睇啦 🌿
+        ${updateStr ? `<div class="update-time">${updateStr}</div>` : ''}
+      </div>
+      <div class="summary-actions">
+        <button class="share-btn" id="shareBtn">📲 分享俾 Mandy</button>
+        <button class="clear-btn" id="clearBtn">🗑️ 清除今日記錄</button>
+      </div>
+    `;
+    plainText += `🌿 截圖或分享俾 Mandy 睇啦 🌿`;
+  }
+
+  wrap.innerHTML = html;
+
+  const shareBtn = document.getElementById('shareBtn');
+  if (shareBtn) {
+    shareBtn.addEventListener('click', () => {
+      const text = encodeURIComponent(plainText);
+      window.open(`https://wa.me/?text=${text}`, '_blank');
+    });
+  }
+
+  const clearBtn = document.getElementById('clearBtn');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      if (confirm('確定要清除今日所有記錄嗎？')) {
+        clearAll();
+        renderSummary();
+      }
+    });
+  }
+}
+
+// ===== 六合彩 =====
+const lotteryBtn = document.getElementById('lotteryBtn');
+
+function createBalls(containerId) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  for (let i = 0; i < 7; i++) {
+    const b = document.createElement('div');
+    b.className = 'ball';
+    el.appendChild(b);
+  }
+  return el.querySelectorAll('.ball');
+}
+
+function drawLotteryFor(balls, labelId, name, key) {
+  const labelEl = document.getElementById(labelId);
+  labelEl.textContent = '攪緊珠...';
+  const pool = Array.from({length: 49}, (_, i) => i + 1);
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  const numbers = pool.slice(0, 7).sort((a,b) => a - b);
+  lotteryResults[key] = numbers;
+  saveResults();
+
+  numbers.forEach((num, i) => {
+    setTimeout(() => {
+      const ball = balls[i];
+      ball.textContent = num;
+      ball.classList.remove('special');
+      if (i === 6) ball.classList.add('special');
+      ball.classList.add('show');
+      vibrate(15);
+    }, 200 + i * 220);
+  });
+  setTimeout(() => {
+    labelEl.textContent = `🎉 ${name} 嘅特別號碼係最後一個`;
+    if (document.getElementById('summary').classList.contains('active')) {
+      renderSummary();
+    }
+  }, 200 + 7 * 220 + 300);
+}
+
+lotteryBtn.addEventListener('click', () => {
+  lotteryBtn.disabled = true;
+  const tBalls = createBalls('ballsTobby');
+  const mBalls = createBalls('ballsMandy');
+  document.getElementById('labelTobby').textContent = '攪緊珠...';
+  document.getElementById('labelMandy').textContent = '攪緊珠...';
+
+  drawLotteryFor(tBalls, 'labelTobby', 'Tobby', 'tobby');
+  setTimeout(() => {
+    drawLotteryFor(mBalls, 'labelMandy', 'Mandy', 'mandy');
+  }, 600);
+
+  setTimeout(() => {
+    lotteryBtn.disabled = false;
+  }, 200 + 7 * 220 + 1200);
+});
+
+// ===== 頁面返嚟檢查日期 =====
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) {
+    const before = localStorage.getItem(LS_KEYS.lastDate);
+    const after = getCanadaDateStr();
+    if (before !== after) {
+      checkDailyReset();
+      Object.keys(results).forEach(k => results[k] = {});
+      lotteryResults.tobby = [];
+      lotteryResults.mandy = [];
+      allWheels.forEach(w => { w.resultEl.textContent = '—'; });
+      document.getElementById('ballsTobby').innerHTML = '';
+      document.getElementById('ballsMandy').innerHTML = '';
+      document.getElementById('labelTobby').textContent = '撳上面開始攪珠';
+      document.getElementById('labelMandy').textContent = '撳上面開始攪珠';
+      if (document.getElementById('summary').classList.contains('active')) {
+        renderSummary();
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>
